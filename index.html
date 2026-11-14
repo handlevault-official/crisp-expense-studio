@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ExpenseStudio — Daily Budget &amp; Expense Tracker</title>
+<meta name="description" content="Local-first offline daily expense tracker and budget manager. Part of the Crisp Suite.">
+<meta name="theme-color" content="#090d16" id="metaThemeColor">
+<script src="https://cdn.tailwindcss.com"></script> 
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+/* Finance Dark Emerald Theme (Default) */
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #090d16;
+  --card: #101726;
+  --ink: #f8fafc;
+  --mute: #94a3b8;
+  --accent: #10b981; /* Financial Emerald Green */
+  --accent-ink: #042f2e;
+  --warn: #fbbf24;
+  --bad: #f87171;
+  --line: #23314d;
+  --field: #0b111e;
+  --btn-bg: #19243b;
+  --btn-hover: #22314f;
+  --btn-line: #3f5580;
+}
+
+/* Light Finance Theme */
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --card: #ffffff;
+  --ink: #0f172a;
+  --mute: #475569;
+  --accent: #059669;
+  --accent-ink: #ffffff;
+  --warn: #b45309;
+  --bad: #dc2626;
+  --line: #cbd5e1;
+  --field: #f1f5f9;
+  --btn-bg: #ffffff;
+  --btn-hover: #e2e8f0;
+  --btn-line: #94a3b8;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.6 'Plus Jakarta Sans', system-ui, sans-serif;
+  padding: 16px 12px 32px;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+button, input, select { font: inherit; color: inherit; }
+
+button {
+  cursor: pointer;
+  border: 2px solid var(--btn-line);
+  background: var(--btn-bg);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 10px 16px;
+  min-height: 46px;
+  font-weight: 700;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  transition: all 0.15s ease;
+}
+button:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+}
+button.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: transparent;
+  font-weight: 800;
+}
+button.primary:hover:not(:disabled) { filter: brightness(1.1); }
+button.danger {
+  background: rgba(248, 113, 113, 0.15);
+  color: var(--bad);
+  border-color: rgba(248, 113, 113, 0.6);
+}
+
+input, select {
+  width: 100%;
+  background: var(--field);
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: var(--ink);
+  font-size: 1rem;
+  outline: none;
+}
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
+}
+
+label { display: block; font-size: 14px; color: var(--mute); margin-bottom: 4px; font-weight: 700; }
+
+header.top {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: var(--card);
+  border: 2px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+.brand { font-weight: 800; color: var(--accent); font-size: 1.3rem; letter-spacing: -0.02em; }
+.tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+.tabs button { padding: 8px 14px; min-height: 40px; font-size: 14px; }
+.tabs button.on { background: var(--accent); color: var(--accent-ink); border-color: transparent; font-weight: 800; }
+
+main { max-width: 900px; margin: 0 auto; }
+.card { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 20px; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+.hint { color: var(--mute); font-size: 14px; margin: 4px 0; }
+
+@media(max-width: 768px) {
+  .grid2 { grid-template-columns: 1fr; }
+  header.top { flex-direction: column; align-items: stretch; }
+  .tabs { justify-content: stretch; }
+  .tabs button { flex: 1; }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <span class="brand">💰 ExpenseStudio</span>
+    <p class="hint" style="margin:0;">Crisp Suite / HandleVault Finance Utility</p>
+  </div>
+  <nav class="tabs" aria-label="Sections">
+    <button data-tab="expenses" class="on">Expenses</button>
+    <button data-tab="budget">Budget Summary</button>
+  </nav>
+  <div class="row">
+    <button id="btnThemeToggle" type="button" style="padding:6px 12px;min-height:36px;font-size:13px;">🌙 Night Shift</button>
+  </div>
+</header>
+
+<main>
+  <!-- TAB 1: EXPENSE TRANSACTIONS -->
+  <section id="tab-expenses">
+    <div class="card">
+      <h2 style="margin-top:0; font-size:1.2rem; color:var(--accent);">Add Daily Expense</h2>
+      <div class="grid2" style="margin-bottom: 12px;">
+        <div>
+          <label for="descInput">Description</label>
+          <input id="descInput" type="text" placeholder="e.g., Groceries &amp; Veggies">
+        </div>
+        <div>
+          <label for="amountInput">Amount (₱)</label>
+          <input id="amountInput" type="number" step="0.01" placeholder="e.g., 350.00">
+        </div>
+      </div>
+      <div class="grid2" style="margin-bottom: 16px;">
+        <div>
+          <label for="catInput">Category</label>
+          <select id="catInput">
+            <option value="Food &amp; Groceries">Food &amp; Groceries</option>
+            <option value="Transport">Transport / Fuel</option>
+            <option value="Bills &amp; Utilities">Bills &amp; Utilities</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Others">Others</option>
+          </select>
+        </div>
+        <div>
+          <label for="dateInput">Date</label>
+          <input id="dateInput" type="date">
+        </div>
+      </div>
+      <button id="btnAddExpense" class="primary" style="width: 100%;">Record Expense</button>
+    </div>
+
+    <div class="card">
+      <h2 style="margin-top:0; font-size:1.2rem; color:var(--accent);">Recent Transactions</h2>
+      <div id="expenseList" style="display: flex; flex-direction: column; gap: 8px;">
+        <!-- Dynamic Transactions -->
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: BUDGET SUMMARY -->
+  <section id="tab-budget" hidden>
+    <div class="card">
+      <h2 style="margin-top:0; font-size:1.2rem; color:var(--accent);">Monthly Budget Overview</h2>
+      <div class="row" style="margin-bottom: 16px;">
+        <div style="flex: 1;">
+          <label for="budgetLimitInput">Set Monthly Budget Limit (₱)</label>
+          <input id="budgetLimitInput" type="number" value="10000">
+        </div>
+        <div style="align-self: flex-end;">
+          <button id="btnSaveBudget" class="primary">Update Limit</button>
+        </div>
+      </div>
+
+      <div class="grid2" style="margin-top: 20px;">
+        <div style="background: var(--field); padding: 16px; border-radius: 12px; border: 2px solid var(--line);">
+          <div class="hint">Total Spent</div>
+          <div id="totalSpentDisplay" style="font-size: 1.5rem; font-weight: 800; color: var(--bad); margin-top: 4px;">₱0.00</div>
+        </div>
+        <div style="background: var(--field); padding: 16px; border-radius: 12px; border: 2px solid var(--line);">
+          <div class="hint">Remaining Budget</div>
+          <div id="remainingDisplay" style="font-size: 1.5rem; font-weight: 800; color: var(--accent); margin-top: 4px;">₱10,000.00</div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const THEME_KEY = 'expensestudio_theme';
+  const btnTheme = document.getElementById('btnThemeToggle');
+  const metaTheme = document.getElementById('metaThemeColor');
+
+  function applyTheme(theme) {
+    const isLight = theme === 'light';
+    document.documentElement.setAttribute('data-theme', isLight ? 'light' : 'dark');
+    if (btnTheme) btnTheme.textContent = isLight ? '☀️ Day Shift' : '🌙 Night Shift';
+    if (metaTheme) metaTheme.setAttribute('content', isLight ? '#f8fafc' : '#090d16');
+    localStorage.setItem(THEME_KEY, isLight ? 'light' : 'dark');
+  }
+
+  applyTheme(localStorage.getItem(THEME_KEY) || 'dark');
+  btnTheme.addEventListener('click', () => {
+    const current = document.documentElement.getAttribute('data-theme');
+    applyTheme(current === 'light' ? 'dark' : 'light');
+  });
+
+  const tabs = document.querySelectorAll('.tabs button');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('on'));
+      tab.classList.add('on');
+      const target = tab.dataset.tab;
+      document.querySelectorAll('main > section').forEach(sec => {
+        sec.hidden = sec.id !== `tab-${target}`;
+      });
+    });
+  });
+
+  // Default today's date
+  document.getElementById('dateInput').valueAsDate = new Date();
+
+  // Expense Tracker Logic
+  const descInput = document.getElementById('descInput');
+  const amountInput = document.getElementById('amountInput');
+  const catInput = document.getElementById('catInput');
+  const dateInput = document.getElementById('dateInput');
+  const btnAddExpense = document.getElementById('btnAddExpense');
+  const expenseList = document.getElementById('expenseList');
+
+  const totalSpentDisplay = document.getElementById('totalSpentDisplay');
+  const remainingDisplay = document.getElementById('remainingDisplay');
+  const budgetLimitInput = document.getElementById('budgetLimitInput');
+  const btnSaveBudget = document.getElementById('btnSaveBudget');
+
+  let expenses = JSON.parse(localStorage.getItem('expense_items') || '[{"desc": "Groceries", "amount": 450, "cat": "Food & Groceries", "date": "2026-03-30"}, {"desc": "Gasoline", "amount": 600, "cat": "Transport", "date": "2026-03-30"}]');
+  let monthlyLimit = parseFloat(localStorage.getItem('expense_limit') || '10000');
+  budgetLimitInput.value = monthlyLimit;
+
+  function updateSummary() {
+    const total = expenses.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
+    const remaining = monthlyLimit - total;
+    totalSpentDisplay.textContent = `₱${total.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    remainingDisplay.textContent = `₱${remaining.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+    remainingDisplay.style.color = remaining < 0 ? 'var(--bad)' : 'var(--accent)';
+  }
+
+  function renderExpenses() {
+    expenseList.innerHTML = '';
+    expenses.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = 'row';
+      div.style.justify = 'space-between';
+      div.style.background = 'var(--field)';
+      div.style.padding = '10px 14px';
+      div.style.borderRadius = '10px';
+      div.style.border = '2px solid var(--line)';
+      
+      div.innerHTML = `
+        <div>
+          <strong>${item.desc}</strong>
+          <span class="hint" style="margin-left: 6px; color:var(--accent);">[${item.cat}]</span>
+          <div class="hint" style="margin: 2px 0 0;">${item.date}</div>
+        </div>
+        <div class="row">
+          <span style="font-weight: 800; color:var(--bad);">₱${parseFloat(item.amount).toLocaleString('en-US', {minimumFractionDigits: 2})}</span>
+          <button class="danger" style="padding: 4px 8px; min-height: 32px; font-size:12px;" onclick="window.deleteExpense(${idx})">✕</button>
+        </div>
+      `;
+      expenseList.appendChild(div);
+    });
+    updateSummary();
+  }
+
+  window.deleteExpense = (idx) => {
+    expenses.splice(idx, 1);
+    localStorage.setItem('expense_items', JSON.stringify(expenses));
+    renderExpenses();
+  };
+
+  btnAddExpense.addEventListener('click', () => {
+    const desc = descInput.value.trim();
+    const amount = parseFloat(amountInput.value);
+    const cat = catInput.value;
+    const date = dateInput.value || new Date().toISOString().split('T')[0];
+
+    if (desc && !isNaN(amount) && amount > 0) {
+      expenses.unshift({ desc, amount, cat, date });
+      localStorage.setItem('expense_items', JSON.stringify(expenses));
+      descInput.value = '';
+      amountInput.value = '';
+      renderExpenses();
+    }
+  });
+
+  btnSaveBudget.addEventListener('click', () => {
+    const limit = parseFloat(budgetLimitInput.value);
+    if (!isNaN(limit) && limit >= 0) {
+      monthlyLimit = limit;
+      localStorage.setItem('expense_limit', monthlyLimit);
+      updateSummary();
+    }
+  });
+
+  renderExpenses();
+})();
+</script>
+<script src="repo.js"></script>
+</body>
+</html>
